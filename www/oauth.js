@@ -83,6 +83,29 @@ module.exports = {
 	getVersion: function() {
 		return config.version;
 	},
+	create: function(provider, tokens, request) {
+		if ( ! tokens)
+			return tryCache(provider, true);
+
+		if (typeof request !== 'object')
+			providers_api.fetchDescription(provider);
+
+		var make_res = function(method) {
+			return mkHttp(provider, tokens, request, method);
+		}
+
+		var res = {};
+		for (var i in tokens)
+			res[i] = tokens[i];
+
+		res.get = make_res('GET');
+		res.post = make_res('POST');
+		res.put = make_res('PUT');
+		res.patch = make_res('PATCH');
+		res.del = make_res('DELETE');
+
+		return res;
+	},
 	popup: function(provider, opts, callback) {
 		var wnd, wndTimeout;
 		if ( ! config.key)
